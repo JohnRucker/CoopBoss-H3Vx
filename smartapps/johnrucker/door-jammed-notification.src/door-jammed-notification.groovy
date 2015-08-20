@@ -9,13 +9,13 @@ definition(
     author: "John.Rucker@Solar-current.com",
     description: "Get a push notification and text messages when your CoopBoss detects a door jam.",
     category: "My Apps",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+    iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
+    iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",
+    iconX3Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo3x.png")
 
 preferences {
     section("When the door state changes") {
-        paragraph "Send a SmartThings notification only when the coop's door jammed and did not close."
+        paragraph "Send a SmartThings notification when the coop's door jammed and did not close."
 		input "doorSensor", "capability.doorControl", title: "Select CoopBoss", required: true, multiple: false            
         input("recipients", "contact", title: "Recipients", description: "Send notifications to") {
         	input "phone", "phone", title: "Phone number?", required: true}

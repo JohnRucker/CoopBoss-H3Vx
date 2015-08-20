@@ -19,9 +19,9 @@ definition(
     author: "John Rucker",
     description: "Change the color of your Hue bulbs based on your coop's door status.",
     category: "My Apps",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+    iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
+    iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",
+    iconX3Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo3x.png")
 
 
 preferences {
