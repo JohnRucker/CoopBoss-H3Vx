@@ -13,6 +13,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *  Icon location = http://scripts.3dgo.net/smartthings/icons/
  */
+ 
 metadata {
 	definition (name: "CoopBoss H3Vx", namespace: "JohnRucker", author: "John.Rucker@Solar-Current.com") {
         capability "Refresh"
