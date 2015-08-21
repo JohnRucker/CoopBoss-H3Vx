@@ -3,6 +3,7 @@
  *
  *  Author: SmartThings
  */
+ 
 definition(
     name: "Door Jammed Notification",
     namespace: "JohnRucker",
