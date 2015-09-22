@@ -13,7 +13,6 @@
  *  for the specific language governing permissions and limitations under the License.
  *  Icon location = http://scripts.3dgo.net/smartthings/icons/
  */
- 
 metadata {
 	definition (name: "CoopBoss H3Vx", namespace: "JohnRucker", author: "John.Rucker@Solar-Current.com") {
         capability "Refresh"
@@ -23,8 +22,8 @@ metadata {
         capability "Configuration"
 		capability "Temperature Measurement"   
         capability "Door Control"
+  		capability "Switch"
         
-        command "setOpenLightLevel"
         command "closeDoor"
         command "closeDoorHiI"
         command "openDoor"
@@ -32,10 +31,17 @@ metadata {
         command "autoCloseOff"
         command "autoOpenOn"
         command "autoOpenOff"
-        command "setOpenLevel"
         command "setCloseLevelTo"
         command "setOpenLevelTo" 
         command "setSensitivityLevel"
+        command "Aux1On"
+        command "Aux1Off"        
+        command "Aux2On"
+        command "Aux2Off" 
+        command "updateTemp1"
+        command "updateTemp2"
+        command "updateSun"
+        command "setNewBaseCurrent"
 
         attribute "doorState","string"
         attribute "currentLightLevel","number"
@@ -47,7 +53,12 @@ metadata {
         attribute "TempProb2","number"   
         attribute "dayOrNight","string"
         attribute "doorSensitivity","number"
-        attribute "doorCurrent","number"        
+        attribute "doorCurrent","number"  
+        attribute "doorVoltage","number"
+        attribute "Aux1","string"
+        attribute "Aux2","string"
+        attribute "coopStatus","string"
+        attribute "baseDoorCurrent","number"
 
     	fingerprint profileId: "0104", inClusters: "0000,0101,0402"
     
@@ -66,89 +77,124 @@ metadata {
        
 
 	// UI tile definitions
-	tiles {       
-		standardTile("doorCtrl", "device.doorState", width: 1, height: 1, canChangeIcon: true){
-			state "unknown", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", nextState:"Sent"          
-			state "open", label: '${name}', action:"closeDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#0000ff" , nextState:"Sent" 
-			state "opening", label: '${name}', action:"closeDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ffa81e"            
-			state "closed", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#79b821", nextState:"Sent" 
-			state "closing", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ffa81e" 
-			state "jammed", label: '${name}', action:"closeDoorHiI", icon: "st.Outdoor.outdoor20", backgroundColor: "#ff0000", nextState:"Sent" 
-			state "forced close", label: 'forced\rclose', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ff8000", nextState:"Sent"     
+	tiles(scale: 2){        
+		multiAttributeTile(name:"doorCtrl", type:"generic", width:6, height:4) {tileAttribute("device.doorState", key: "PRIMARY_CONTROL") 
+        	{  
+			attributeState "unknown", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", nextState:"Sent"          
+			attributeState "open", label: '${name}', action:"closeDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#0000ff" , nextState:"Sent" 
+			attributeState "opening", label: '${name}', action:"closeDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ffa81e"            
+			attributeState "closed", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#79b821", nextState:"Sent" 
+			attributeState "closing", label: '${name}', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ffa81e" 
+			attributeState "jammed", label: '${name}', action:"closeDoorHiI", icon: "st.Outdoor.outdoor20", backgroundColor: "#ff0000", nextState:"Sent" 
+			attributeState "forced close", label: 'forced\rclose', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ff8000", nextState:"Sent"   
+			attributeState "fault", label: 'FAULT', action:"openDoor", icon: "st.Outdoor.outdoor20", backgroundColor: "#ff0000", nextState:"Sent"              
+			attributeState "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"              
+			} 
+            tileAttribute ("device.coopStatus", key: "SECONDARY_CONTROL") {
+				attributeState "device.coopStatus", label:'${currentValue}'
+			}
+        }
+                     
+		multiAttributeTile(name:"dtlsDoorCtrl", type:"generic", width:6, height:4) {tileAttribute("device.doorState", key: "PRIMARY_CONTROL") 
+        	{
+      		attributeState "unknown", label: '${name}', action:"openDoor", icon: "st.secondary.tools", nextState:"Sent"
+      		attributeState "open", label: '${name}', action:"closeDoor", icon: "st.doors.garage.garage-open", backgroundColor: "#0000ff", nextState:"Sent"
+            attributeState "opening", label: '${name}', action:"closeDoor", icon: "st.doors.garage.garage-opening", backgroundColor: "#ffa81e" 
+            attributeState "closed", label: '${name}', action:"openDoor", icon: "st.doors.garage.garage-closed", backgroundColor: "#79b821", nextState:"Sent"
+            attributeState "closing", label: '${name}', action:"openDoor", icon: "st.doors.garage.garage-closing", backgroundColor: "#ffa81e" 
+            attributeState "jammed", label: '${name}', action:"closeDoorHiI", icon: "st.doors.garage.garage-open", backgroundColor: "#ff0000", nextState:"Sent"
+            attributeState "forced close", label: "forced", action:"openDoor", icon: "st.doors.garage.garage-closed", backgroundColor: "#ff8000", nextState:"Sent"
+            attributeState "fault", label: 'FAULT', action:"openDoor", icon: "st.secondary.tools", backgroundColor: "#ff0000", nextState:"Sent"  
+            attributeState "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"
+            } 
+            tileAttribute ("device.doorState", key: "SECONDARY_CONTROL") {
+				attributeState "unknown", label: 'Door is in unknown state. Push to open.'
+                attributeState "open", label: 'Coop door is open. Push to close.'
+                attributeState "opening", label: 'Caution, door is opening!'
+                attributeState "closed", label: 'Coop door is closed. Push to open.'
+                attributeState "closing", label: 'Caution, door is closing!'
+                attributeState "jammed", label: 'Door open! Push for high-force close'
+                attributeState "forced close", label: "Door is closed. Push to open."
+                attributeState "fault", label: 'Door fault check electrical connection.'
+                attributeState "Sent", label: 'Command sent to CoopBoss...'
+			}                 
+    	}        
+        
+		standardTile("autoClose", "device.autoCloseEnable", width: 2, height: 2){
+			state "on", label: 'Auto', action:"autoCloseOff", icon: "st.doors.garage.garage-closing", backgroundColor: "#79b821", nextState:"Sent"
+			state "off", label: 'Auto', action:"autoCloseOn", icon: "st.doors.garage.garage-closing", nextState:"Sent"
 			state "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"              
 		}    
         
-		standardTile("dtlsDoorCtrl", "device.doorState", width: 2, height: 2){
-			state "unknown", label: '${name}', action:"openDoor", icon: "st.secondary.tools", nextState:"Sent"         
-			state "open", label: '${name}', action:"closeDoor", icon: "st.doors.garage.garage-open", backgroundColor: "#0000ff", nextState:"Sent"  
-			state "opening", label: '${name}', action:"closeDoor", icon: "st.doors.garage.garage-opening", backgroundColor: "#ffa81e"            
-			state "closed", label: '${name}', action:"openDoor", icon: "st.doors.garage.garage-closed", backgroundColor: "#79b821", nextState:"Sent" 
-			state "closing", label: '${name}', action:"openDoor", icon: "st.doors.garage.garage-closing", backgroundColor: "#ffa81e"  
-			state "jammed", label: '${name}', action:"closeDoorHiI", icon: "st.doors.garage.garage-open", backgroundColor: "#ff0000", nextState:"Sent"  
-			state "forced close", label: "forced", action:"openDoor", icon: "st.doors.garage.garage-closed", backgroundColor: "#ff8000", nextState:"Sent" 
-			state "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"             
+		standardTile("autoOpen", "device.autoOpenEnable", width: 2, height: 2){
+			state "on", label: 'Auto', action:"autoOpenOff", icon: "st.doors.garage.garage-opening", backgroundColor: "#79b821", nextState:"Sent"
+			state "off", label: 'Auto', action:"autoOpenOn", icon: "st.doors.garage.garage-opening", nextState:"Sent"
+			state "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"              
 		}            
         
-		standardTile("autoClose", "device.autoCloseEnable", width: 1, height: 1){
-			state "on", label: 'Auto', action:"autoCloseOff", icon: "st.doors.garage.garage-closing", backgroundColor: "#79b821"
-			state "off", label: 'Auto', action:"autoCloseOn", icon: "st.doors.garage.garage-closing"
-		}    
+		valueTile("TempProb1", "device.TempProb1", width: 2, height: 2, decoration: "flat"){
+        state defaultState: true, label:'Coop\r${currentValue}°', unit:"F", action:"updateTemp1"}         
         
-		standardTile("autoOpen", "device.autoOpenEnable", width: 1, height: 1){
-			state "on", label: 'Auto', action:"autoOpenOff", icon: "st.doors.garage.garage-opening", backgroundColor: "#79b821"
-			state "off", label: 'Auto', action:"autoOpenOn", icon: "st.doors.garage.garage-opening"
-		}            
-        
-		valueTile("TempProb1", "device.TempProb1", width: 1, height: 1, decoration: "flat"){
-        state defaultState: true, label:'Outside\r${currentValue}°', unit:"F"}              
-        
-		valueTile("TempProb2", "device.TempProb2", width: 1, height: 1, decoration: "flat"){
-        state defaultState: true, label:'Coop\r${currentValue}°', unit:"F"}        
+		valueTile("TempProb2", "device.TempProb2", width: 2, height: 2, decoration: "flat"){
+        state defaultState: true, label:'Outside\r${currentValue}°', unit:"F", action:"updateTemp2"}        
 
-		valueTile("currentLevel", "device.currentLightLevel", width: 1, height: 1, decoration: "flat") {
-        state defaultState: true, label:'Sun\r${currentValue}'}    
+		valueTile("currentLevel", "device.currentLightLevel", width: 2, height: 2, decoration: "flat") {
+        state defaultState: true, label:'Sun\r${currentValue}', action:"updateSun"}    
                 
-        valueTile("dayOrNight", "device.dayOrNight", decoration: "flat",  inactiveLabel: false, width: 3, height: 1) {
+        valueTile("dayOrNight", "device.dayOrNight", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
         state defaultState: true, label:'${currentValue}.'
         }             
                 
-        controlTile("SetClSlider", "device.closeLightLevel", "slider", height: 1, width: 2, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetClSlider", "device.closeLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
         state "closeLightLevel", action:"setCloseLevelTo", backgroundColor:"#d04e00"
         }
         
-        valueTile("SetClValue", "device.closeLightLevel", decoration: "flat",  inactiveLabel: false, width: 1, height: 1) {
+        valueTile("SetClValue", "device.closeLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
         state defaultState: true, label:'Close\nSunlight\n${currentValue}'
         }        
         
-        controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 1, width: 2, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
         state "openLightLevel", action:"setOpenLevelTo", backgroundColor:"#d04e00"
         }
         
-        valueTile("SetOpValue", "device.openLightLevel", decoration: "flat",  inactiveLabel: false, width: 1, height: 1) {
+        valueTile("SetOpValue", "device.openLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
         state defaultState: true, label:'Open\nSunlight\n${currentValue}'
         } 
         
-        controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 1, width: 2, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
         state "openLightLevel", action:"setSensitivityLevel", backgroundColor:"#d04e00"
         }        
         
-        valueTile("SetSensitivityValue", "device.doorSensitivity", decoration: "flat",  inactiveLabel: false, width: 1, height: 1) {
+        valueTile("SetSensitivityValue", "device.doorSensitivity", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
         state defaultState: true, label:'Door\nSensitivity\n${currentValue}'
         }          
         
-        standardTile("refresh", "device.refresh", decoration: "flat", inactiveLabel: false) {
+        standardTile("refresh", "device.refresh", width: 2, height: 2, decoration: "flat", inactiveLabel: false) {
 		state defaultState: true, label:'All', action:"refresh.refresh", icon:"st.secondary.refresh-icon"
-		}         
+		}   
+        
+		standardTile("aux1", "device.Aux1", width: 2, height: 2, canChangeIcon: true) {
+			state "off", label:'Aux 1', action:"Aux1On", icon:"st.switches.switch.off", backgroundColor:"#ffffff", nextState:"Sent"        
+			state "on", label:'Aux 1', action:"Aux1Off", icon:"st.switches.switch.on", backgroundColor:"#79b821", nextState:"Sent"
+			state "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"            
+		}        
+        
+		standardTile("aux2", "device.Aux2", width: 2, height: 2, canChangeIcon: true) {
+			state "off", label:'Aux 2', action:"Aux2On", icon:"st.switches.switch.off", backgroundColor:"#ffffff", nextState:"Sent"        
+			state "on", label:'Aux 2', action:"Aux2Off", icon:"st.switches.switch.on", backgroundColor:"#79b821", nextState:"Sent"
+			state "Sent", label: 'wait', icon: "st.motion.motion.active", backgroundColor: "#ffa81e"   
+		}            
         
 		main "doorCtrl"
-		details (["dtlsDoorCtrl", "autoClose", "autoOpen",  "TempProb1", "TempProb2", "currentLevel", "dayOrNight",
-        "SetClSlider", "SetClValue", "SetOpSlider", "SetOpValue", "SetSensitivitySlider", "SetSensitivityValue", "refresh"])
+		details (["dtlsDoorCtrl", "TempProb1", "TempProb2", "currentLevel", "autoClose", "autoOpen", "dayOrNight",
+        "SetClSlider", "SetClValue", "SetOpSlider", "SetOpValue", "SetSensitivitySlider", "SetSensitivityValue",
+        "aux1", "aux2", "refresh"])
 	}
 }
 
 // Parse incoming device messages to generate events  def parse(String description) {
 def parse(String description) {
-	//log.debug "description: $description"
+	log.debug "description: $description"
 	Map map = [:]
 	if (description?.startsWith('catchall:')) {
 		map = parseCatchAllMessage(description)
@@ -166,6 +212,7 @@ def parse(String description) {
 private Map parseCatchAllMessage(String description) {
     Map resultMap = [:]    
     def cluster = zigbee.parse(description)
+    log.debug cluster
     if (cluster.clusterId == 0x0402) {
         switch(cluster.sourceEndpoint) {
 
@@ -174,7 +221,7 @@ private Map parseCatchAllMessage(String description) {
             resultMap.name = "TempProb1"
             def celsius = Integer.valueOf(temp,16).shortValue()    
             if (celsius ==  -32768){									// This number is used to indicate an error in the temperature reading
-                resultMap.value = "ERR"
+                resultMap.value = "---"
             }else{
                 celsius = celsius / 100									// Temperature value is sent X 100.
                 resultMap.value = celsiusToFahrenheit(celsius)		
@@ -183,6 +230,7 @@ private Map parseCatchAllMessage(String description) {
 					resultMap.value = resultMap.value + offset
                 }                      
             }
+            sendEvent(name: "temperature", value: resultMap.value, displayed: false)		// set the temperatureMeasurment capability to temperature
             break
 
             case 0x40:													// Endpoint 0x40 is the temperature of probe 2
@@ -191,7 +239,7 @@ private Map parseCatchAllMessage(String description) {
             def celsius = Integer.valueOf(temp,16).shortValue() 									
             //resultMap.descriptionText = "Prob2 celsius value = ${celsius}"
             if (celsius ==  -32768){									// This number is used to indicate an error in the temperature reading
-                resultMap.value = "ERR"
+                resultMap.value = "---"
             }else{
             	celsius = celsius / 100									// Temperature value is sent X 100.
                 resultMap.value = celsiusToFahrenheit(celsius)			
@@ -199,11 +247,64 @@ private Map parseCatchAllMessage(String description) {
                     def offset = tempOffsetCoop as int
 					resultMap.value = resultMap.value + offset
                 }                                                
-            }                
-            sendEvent(name: "temperature", value: resultMap.value)		// set the temperatureMeasurment capability to temperature             
+            }                           
             break
     	}                        
-	}  
+	}
+    
+    if (cluster.clusterId == 0x0101 && cluster.command == 0x0b) {		// This is a default response to a command sent to cluster 0x0101 door control
+    	//log.debug "Default Response Data = $cluster.data"
+        switch(cluster.data) {
+        
+        case "[10, 0]":		// 0x0a turn auto close on command verified          
+        resultMap.name = "autoCloseEnable"
+        resultMap.value = "on"        
+        break                 
+        
+        case "[11, 0]":		// 0x0b turn auto close off command verified          
+        resultMap.name = "autoCloseEnable"
+        resultMap.value = "off"        
+        break            
+        
+        case "[12, 0]":		// 0x0C turn auto open on command verified           
+        resultMap.name = "autoOpenEnable"
+        resultMap.value = "on"        
+        break    
+        
+        case "[13, 0]":		// 0x0d turn auto open off command verified           
+        resultMap.name = "autoOpenEnable"
+        resultMap.value = "off"        
+        break               
+        
+        
+        case "[20, 0]":		// 0x14 Aux1 On command verified 
+        log.info "verified Aux1 On"
+    	sendEvent(name: "switch", value: "on", displayed: false)   
+        resultMap.name = "Aux1"
+        resultMap.value = "on"        
+        break
+
+        case "[21, 0]":		// 0x15 Aux1 Off command verified 
+        log.info "verified Aux1 Off"
+    	sendEvent(name: "switch", value: "off", displayed: false)
+        resultMap.name = "Aux1"
+        resultMap.value = "off"
+        break
+        
+        case "[22, 0]":		// 0x16 Aux2 On command verified 
+        log.info "verified Aux2 On"    
+        resultMap.name = "Aux2"
+        resultMap.value = "on"        
+        break
+
+        case "[23, 0]":		// 0x17 Aux2 Off command verified 
+        log.info "verified Aux2 Off"
+        resultMap.name = "Aux2"
+        resultMap.value = "off"        
+        break        
+        
+        }
+    }
     return resultMap
 }
 
@@ -215,10 +316,13 @@ private Map parseReportAttributeMessage(String description) {
         resultMap.name = "doorState"
         if (descMap.value == "00"){
             resultMap.value = "unknown"
+            sendEvent(name: "door", value: "unknown", displayed: false)
         }else if(descMap.value == "01"){
             resultMap.value = "closed"
+            sendEvent(name: "door", value: "closed", displayed: false)            
         }else if(descMap.value == "02"){
-            resultMap.value = "open"                   
+            resultMap.value = "open"    
+            sendEvent(name: "door", value: "open", displayed: false)              
         }else if(descMap.value == "03"){
             resultMap.value = "jammed"     
         }else if(descMap.value == "04"){
@@ -226,9 +330,13 @@ private Map parseReportAttributeMessage(String description) {
         }else if(descMap.value == "05"){
             resultMap.value = "forced close"   
         }else if(descMap.value == "06"){
-            resultMap.value = "closing"   
+            resultMap.value = "closing"  
+            sendEvent(name: "door", value: "closing", displayed: false)              
         }else if(descMap.value == "07"){
-            resultMap.value = "opening"                   
+            resultMap.value = "opening"
+            sendEvent(name: "door", value: "opening", displayed: false)                 
+        }else if(descMap.value == "08"){
+            resultMap.value = "fault"            
         }else {            
             resultMap.value = "unknown"
         }   
@@ -238,14 +346,21 @@ private Map parseReportAttributeMessage(String description) {
         resultMap.name = "currentLightLevel"
         resultMap.value = (Integer.parseInt(descMap.value, 16))      
         resultMap.displayed = false
-        def cLL = device.currentState("closeLightLevel")?.value as int
-        def oLL = device.currentState("openLightLevel")?.value as int 
+        def cTmp = device.currentState("TempProb1")?.value 
         def nLL = resultMap.value as int
-        if (nLL < cLL){  
-           	sendEvent(name: "dayOrNight", value: "The current sunlight level is ${nLL}, it must be > ${oLL} for an auto open", displayed: false)
-        }else { 
-            sendEvent(name: "dayOrNight", value: "The current sunlight level is ${nLL}, it must be < ${cLL} for an auto close", displayed: false)
-        }
+        updateStatusTxt(cTmp, nLL)
+        
+        //def cLL = device.currentState("closeLightLevel")?.value as int
+        //def oLL = device.currentState("openLightLevel")?.value as int 
+        //def cTmp = device.currentState("TempProb1")?.value 
+        //def nLL = resultMap.value as int
+        //if (nLL < cLL){  
+        //   	sendEvent(name: "dayOrNight", value: "Sun level is ${nLL}, it must be > ${oLL} to auto open", displayed: false)
+        //    sendEvent(name: "coopStatus", value: "Sunlight ${nLL} open at ${oLL}. Coop ${cTmp}°", displayed: false)
+        //}else { 
+        //    sendEvent(name: "dayOrNight", value: "Sun level is ${nLL}, it must be < ${cLL} to auto close", displayed: false)
+        //    sendEvent(name: "coopStatus", value: "Sunlight ${nLL} close at ${cLL}. Coop ${cTmp}°", displayed: false)
+        //}
         
     } else if (descMap.cluster == "0101" && descMap.attrId == "0401") { 
         resultMap.name = "closeLightLevel"
@@ -268,13 +383,40 @@ private Map parseReportAttributeMessage(String description) {
     } else if (descMap.cluster == "0101" && descMap.attrId == "0405") { 
         resultMap.name = "doorCurrent"
         resultMap.value = (Integer.parseInt(descMap.value, 16)) 
+        resultMap.value = resultMap.value * 0.001        
 
      } else if (descMap.cluster == "0101" && descMap.attrId == "0408") { 
         resultMap.name = "doorSensitivity"
         resultMap.value = (100 - Integer.parseInt(descMap.value, 16))
-    
-    } 
-    
+        
+    } else if (descMap.cluster == "0101" && descMap.attrId == "0409") { 
+        resultMap.name = "baseDoorCurrent"
+        resultMap.value = (Integer.parseInt(descMap.value, 16)) 
+        resultMap.value = resultMap.value * 0.001                
+        
+    } else if (descMap.cluster == "0101" && descMap.attrId == "040a") { 
+        resultMap.name = "doorVoltage"
+        resultMap.value = (Integer.parseInt(descMap.value, 16))  
+        resultMap.value = resultMap.value * 0.001
+        
+    } else if (descMap.cluster == "0101" && descMap.attrId == "040b") { 
+        resultMap.name = "Aux1"
+        if(descMap.value == "01"){
+        resultMap.value = "on"
+    	sendEvent(name: "switch", value: "on", displayed: false)        
+        }else{
+        resultMap.value = "off"        
+    	sendEvent(name: "switch", value: "off", displayed: false)        
+        }
+     
+    } else if (descMap.cluster == "0101" && descMap.attrId == "040c") { 
+        resultMap.name = "Aux2"
+        if(descMap.value == "01"){
+        resultMap.value = "on"
+        }else{
+        resultMap.value = "off"        
+        }  
+    }     
     return resultMap
 }
 
@@ -309,7 +451,45 @@ def getFahrenheit(value) {
 	return celsiusToFahrenheit(celsius) as Integer
 }
 
+def updateStatusTxt(currentTemp, currentLight){
+	log.info "called updateStatusTxt with ${currentTemp}, ${currentLight}"
+    def cTmp = currentTemp
+    def cLL = device.currentState("closeLightLevel")?.value as int
+    def oLL = device.currentState("openLightLevel")?.value as int 
+    def aOpnEn = device.currentState("autoOpenEnable")?.value
+    def aClsEn = device.currentState("autoCloseEnable")?.value
+    
+        if (currentLight < cLL){  
+        	if (aOpnEn == "on"){
+           		sendEvent(name: "dayOrNight", value: "Sun must be > ${oLL} to auto open", displayed: false)
+            	sendEvent(name: "coopStatus", value: "Sunlight ${currentLight} open at ${oLL}. Coop ${cTmp}°", displayed: false)
+                }else{
+           		sendEvent(name: "dayOrNight", value: "Auto Open is turned off.", displayed: false)
+            	sendEvent(name: "coopStatus", value: "Sunlight ${currentLight} auto open off. Coop ${cTmp}°", displayed: false)                
+                }
+        }else { 
+        	if (aClsEn == "on"){        
+            	sendEvent(name: "dayOrNight", value: "Sun must be < ${cLL} to auto close", displayed: false)
+            	sendEvent(name: "coopStatus", value: "Sunlight ${currentLight} close at ${cLL}. Coop ${cTmp}°", displayed: false)
+                }else{
+           		sendEvent(name: "dayOrNight", value: "Auto Close is turned off.", displayed: false)
+            	sendEvent(name: "coopStatus", value: "Sunlight ${currentLight} auto close off. Coop ${cTmp}°", displayed: false)                   
+                }
+        }
+}
+
+
 // Commands to device
+
+def on() {
+	log.debug "on calling Aux1On"
+    Aux1On()
+}
+
+def off() {
+	log.debug "off calling Aux1Off"
+    Aux1Off()
+}
 
 def close() {
 	log.debug "close calling closeDoor"
@@ -321,45 +501,58 @@ def open() {
 	openDoor()
 }
 
+def Aux1On(){
+	log.debug "Sending Aux1 = on command"
+	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x14 {}"             
+}
+
+def Aux1Off(){     
+	log.debug "Sending Aux1 = off command"
+	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x15 {}"             
+}
+
+def Aux2On(){
+	log.debug "Sending Aux2 = on command"
+	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x16 {}"             
+}
+
+def Aux2Off(){
+	log.debug "Sending Aux2 = off command"
+	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x17 {}"             
+}
+
 def openDoor() {
-	sendEvent(name: "doorState", value: "opening")
 	log.debug "Sending Open command"
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x1 {}"
 }
 
 def closeDoor() {
-	sendEvent(name: "doorState", value: "closing")
 	log.debug "Sending Close command"
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0 {}"
 }
 
 def closeDoorHiI() {
-	sendEvent(name: "doorState", value: "closing")
 	log.debug "Sending High Current Close command"
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x4 {}"
 }
 
 def autoOpenOn() {
 	log.debug "Setting Auto Open On"
-	sendEvent(name: "autoOpenEnable", value: "on")
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0C {}"
 }
 
 def autoOpenOff() {
 	log.debug "Setting Auto Open Off"
-	sendEvent(name: "autoOpenEnable", value: "off")
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0D {}"
 }
 
 def autoCloseOn() {
 	log.debug "Setting Auto Close On"
-	sendEvent(name: "autoCloseEnable", value: "on")
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0A {}"
 }
 
 def autoCloseOff() {
 	log.debug "Setting Auto Close Off"
-	sendEvent(name: "autoCloseEnable", value: "off")
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0B {}"
 }
 
@@ -395,13 +588,18 @@ def setSensitivityLevel(cValue) {
     cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x408 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value. SmartThings does not send a 32 bit integer value but the receiving code was written to accept this.  They should fix this command!!
     cmd << "delay 150"
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x408"											// Read attribute 
-    cmd 
-    
+    cmd    
 }
 
-def setNormalCloseCurrent() {
-	log.debug "Sending set normal current to last door close current"
-	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x13 {}"
+def setNewBaseCurrent(cValue) {
+	def cX = cValue as int
+	log.info "Setting new BaseCurrent to ${cX} Hex = 0x${Integer.toHexString(cX)}"
+    
+    def cmd = []
+    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value. SmartThings does not send a 32 bit integer value but the receiving code was written to accept this.  They should fix this command!!
+    cmd << "delay 150"
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409"											// Read attribute 
+    cmd    
 }
 
 def poll(){
@@ -420,6 +618,29 @@ def poll(){
     
     cmd
 }
+
+def updateTemp1() {
+	log.debug "Sending attribute read request for Temperature Probe1"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x39 0x0402 0x0000"    // Read Current Temperature from Coop Probe 1
+    cmd
+}
+
+def updateTemp2() {
+	log.debug "Sending attribute read request for Temperature Probe2"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x40 0x0402 0x0000"    // Read Current Temperature from Coop Probe 2   
+    cmd
+}
+
+
+def updateSun() {
+	log.debug "Sending attribute read request for Sun Light Level"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0400"	// Read Current Light Level
+    cmd
+}
+
 
 def refresh() {
 	log.debug "sending refresh command"   
@@ -449,24 +670,20 @@ def refresh() {
     cmd << "delay 150"   
     
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0405"    // Current required to close door      
+    cmd << "delay 150"   
+    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x040B"    // Aux1 Status      
+    cmd << "delay 150"       
+    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x040C"    // Aux2 Status      
+    cmd << "delay 150"     
+    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409"		// Read Base current
     cmd << "delay 150"     
     
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0408"    // Object detection sensitivity      
     cmd
 }
-
-def setOpenLightLevel(value){
-	log.debug "Setting Open Light Level to ${value} MPH."
-    float xFloat = value																					// Convert value to Single Float
-    int xBits = Float.floatToIntBits(xFloat)																// Convert single to bits
-      
-    def cmd = []
-    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x000C 0x0401 0x39 {${Integer.toHexString(xBits)}}"	
-    cmd << "delay 150"
-    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x000C 0x0401"										 
-    cmd    
-}
-
 
 def configure() {
     log.debug "Binding SEP 0x38 DEP 0x01 Cluster 0x0101 Lock cluster to hub"  
