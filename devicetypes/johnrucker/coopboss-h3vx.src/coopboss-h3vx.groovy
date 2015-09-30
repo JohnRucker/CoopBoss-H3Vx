@@ -145,7 +145,7 @@ metadata {
         state defaultState: true, label:'${currentValue}.'
         }             
                 
-        controlTile("SetClSlider", "device.closeLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetClSlider", "device.closeLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
         state "closeLightLevel", action:"setCloseLevelTo", backgroundColor:"#d04e00"
         }
         
@@ -153,7 +153,7 @@ metadata {
         state defaultState: true, label:'Close\nSunlight\n${currentValue}'
         }        
         
-        controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
         state "openLightLevel", action:"setOpenLevelTo", backgroundColor:"#d04e00"
         }
         
@@ -161,7 +161,7 @@ metadata {
         state defaultState: true, label:'Open\nSunlight\n${currentValue}'
         } 
         
-        controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 2, width: 4, inactiveLabel: false, range:"(0..100)") {
+        controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
         state "openLightLevel", action:"setSensitivityLevel", backgroundColor:"#d04e00"
         }        
         
@@ -206,7 +206,9 @@ def parse(String description) {
 		map = parseCustomMessage(description)
 	}
     log.debug map
-	return map ? createEvent(map) : null
+	//return map ? createEvent(map) : null
+    sendEvent(map)
+    callUpdateStatusTxt() 
 }
 
 private Map parseCatchAllMessage(String description) {
@@ -346,21 +348,6 @@ private Map parseReportAttributeMessage(String description) {
         resultMap.name = "currentLightLevel"
         resultMap.value = (Integer.parseInt(descMap.value, 16))      
         resultMap.displayed = false
-        def cTmp = device.currentState("TempProb1")?.value 
-        def nLL = resultMap.value as int
-        updateStatusTxt(cTmp, nLL)
-        
-        //def cLL = device.currentState("closeLightLevel")?.value as int
-        //def oLL = device.currentState("openLightLevel")?.value as int 
-        //def cTmp = device.currentState("TempProb1")?.value 
-        //def nLL = resultMap.value as int
-        //if (nLL < cLL){  
-        //   	sendEvent(name: "dayOrNight", value: "Sun level is ${nLL}, it must be > ${oLL} to auto open", displayed: false)
-        //    sendEvent(name: "coopStatus", value: "Sunlight ${nLL} open at ${oLL}. Coop ${cTmp}°", displayed: false)
-        //}else { 
-        //    sendEvent(name: "dayOrNight", value: "Sun level is ${nLL}, it must be < ${cLL} to auto close", displayed: false)
-        //    sendEvent(name: "coopStatus", value: "Sunlight ${nLL} close at ${cLL}. Coop ${cTmp}°", displayed: false)
-        //}
         
     } else if (descMap.cluster == "0101" && descMap.attrId == "0401") { 
         resultMap.name = "closeLightLevel"
@@ -373,7 +360,7 @@ private Map parseReportAttributeMessage(String description) {
     } else if (descMap.cluster == "0101" && descMap.attrId == "0403") { 
         resultMap.name = "autoCloseEnable"
         if (descMap.value == "01"){resultMap.value = "on"}
-        else{resultMap.value = "off"}
+        else{resultMap.value = "off"}       
 
     } else if (descMap.cluster == "0101" && descMap.attrId == "0404") { 
         resultMap.name = "autoOpenEnable"
@@ -421,6 +408,7 @@ private Map parseReportAttributeMessage(String description) {
 }
 
 private Map parseCustomMessage(String description) {
+    //log.info "ParseCustomMessage called with ${description}"
 	Map resultMap = [:]
     if (description?.startsWith('temperature: ')) {
         resultMap.name = "temperature"
@@ -430,7 +418,7 @@ private Map parseCustomMessage(String description) {
             resultMap.value = "ERR"
         }else{
             resultMap.value = celsiusToFahrenheit(rawT.toFloat()) as Float
-            sendEvent(name: "TempProb2", value: resultMap.value, displayed: false)		// Workaround for lack of access to endpoint information for Temperature report  
+            sendEvent(name: "TempProb1", value: resultMap.value, displayed: false)		// Workaround for lack of access to endpoint information for Temperature report  
         }        
 	}
     resultMap.displayed = false
@@ -451,8 +439,16 @@ def getFahrenheit(value) {
 	return celsiusToFahrenheit(celsius) as Integer
 }
 
+// Private methods
+def callUpdateStatusTxt(){
+	def cTemp = device.currentState("TempProb1")?.value
+	def cLight = device.currentState("currentLightLevel")?.value as int
+    
+	updateStatusTxt(cTemp, cLight)
+}
+
 def updateStatusTxt(currentTemp, currentLight){
-	log.info "called updateStatusTxt with ${currentTemp}, ${currentLight}"
+	//log.info "called updateStatusTxt with ${currentTemp}, ${currentLight}"
     def cTmp = currentTemp
     def cLL = device.currentState("closeLightLevel")?.value as int
     def oLL = device.currentState("openLightLevel")?.value as int 
@@ -478,9 +474,7 @@ def updateStatusTxt(currentTemp, currentLight){
         }
 }
 
-
 // Commands to device
-
 def on() {
 	log.debug "on calling Aux1On"
     Aux1On()
@@ -537,12 +531,12 @@ def closeDoorHiI() {
 }
 
 def autoOpenOn() {
-	log.debug "Setting Auto Open On"
+	log.debug "Setting Auto Open On"   
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0C {}"
 }
 
 def autoOpenOff() {
-	log.debug "Setting Auto Open Off"
+	log.debug "Setting Auto Open Off"   
 	"st cmd 0x${device.deviceNetworkId} 0x38 0x0101 0x0D {}"
 }
 
@@ -564,8 +558,7 @@ def setOpenLevelTo(cValue) {
     cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x402 0x23 {${Integer.toHexString(cX)}}"	
     cmd << "delay 150"
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x402"											// Read light value   
-    cmd 
-    
+    cmd    
 }
 
 def setCloseLevelTo(cValue) {
@@ -700,6 +693,6 @@ def configure() {
     
     log.info "Sending ZigBee Configuration Commands to Coop Control"
     return cmd + refresh()
-	}
+}
 
 
