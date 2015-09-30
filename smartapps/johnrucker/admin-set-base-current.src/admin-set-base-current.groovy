@@ -3,7 +3,7 @@ definition(
     name: "Admin (Set Base Current)",
     namespace: "JohnRucker",
     author: "John.Rucker@Solar-current.com",
-    description: "Sets new base current for door's object detection circuit.",
+    description: "This CoopBoss admin application sets new base current for door's object detection circuit.  Another way to set the CoopBoss base current is to push the program button on the PCB. See calibration settings in the CoopBoss manual",
     category: "My Apps",
     iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
     iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",

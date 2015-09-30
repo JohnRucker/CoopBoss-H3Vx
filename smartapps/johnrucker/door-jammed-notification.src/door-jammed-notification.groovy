@@ -8,7 +8,7 @@ definition(
     name: "Door Jammed Notification",
     namespace: "JohnRucker",
     author: "John.Rucker@Solar-current.com",
-    description: "Get a push notification and text messages when your CoopBoss detects a door jam.",
+    description: "Sends a SmartThings notification and text messages when your CoopBoss detects a door jam.",
     category: "My Apps",
     iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
     iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",
