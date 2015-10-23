@@ -42,6 +42,8 @@ metadata {
         command "updateTemp2"
         command "updateSun"
         command "setNewBaseCurrent"
+        command "setNewPhotoCalibration"
+        command "readNewPhotoCalibration"
 
         attribute "doorState","string"
         attribute "currentLightLevel","number"
@@ -59,7 +61,8 @@ metadata {
         attribute "Aux2","string"
         attribute "coopStatus","string"
         attribute "baseDoorCurrent","number"
-
+        attribute "photoCalibration","number"
+        
     	fingerprint profileId: "0104", inClusters: "0000,0101,0402"
     
 	}
@@ -402,8 +405,11 @@ private Map parseReportAttributeMessage(String description) {
         resultMap.value = "on"
         }else{
         resultMap.value = "off"        
-        }  
-    }     
+        }   
+    } else if (descMap.cluster == "0101" && descMap.attrId == "040d") { 
+        resultMap.name = "photoCalibration"
+        resultMap.value = (Integer.parseInt(descMap.value, 16))           
+    }    
     return resultMap
 }
 
@@ -578,7 +584,7 @@ def setSensitivityLevel(cValue) {
 	log.debug "Setting Door sensitivity level to ${cX} Hex = 0x${Integer.toHexString(cX)}"
     
     def cmd = []
-    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x408 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value. SmartThings does not send a 32 bit integer value but the receiving code was written to accept this.  They should fix this command!!
+    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x408 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value. 
     cmd << "delay 150"
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x408"											// Read attribute 
     cmd    
@@ -589,9 +595,27 @@ def setNewBaseCurrent(cValue) {
 	log.info "Setting new BaseCurrent to ${cX} Hex = 0x${Integer.toHexString(cX)}"
     
     def cmd = []
-    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value. SmartThings does not send a 32 bit integer value but the receiving code was written to accept this.  They should fix this command!!
+    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit integer value.
     cmd << "delay 150"
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409"											// Read attribute 
+    cmd    
+}
+
+def setNewPhotoCalibration(cValue) {
+	def cX = cValue as int
+	log.info "Setting new Photoresister calibration to ${cX} Hex = 0x${Integer.toHexString(cX)}"
+    
+    def cmd = []
+    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40D 0x2B {${Integer.toHexString(cX)}}"		// Write attribute.  0x2B is a 32 bit signed integer value. 
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40D"											// Read attribute 
+    cmd    
+}
+
+def readNewPhotoCalibration() {
+	log.info "Requesting current Photoresister calibration "
+    
+    def cmd = []
+	cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40D"											// Read attribute 
     cmd    
 }
 
