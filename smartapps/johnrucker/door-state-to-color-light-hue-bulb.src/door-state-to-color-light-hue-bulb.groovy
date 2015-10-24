@@ -53,6 +53,8 @@ def coopDoorStateHandler(evt) {
 	def color = "White"
     def hueColor = 100
     def saturation = 100
+    Map hClr = [:]
+    hClr.hex = "#FFFFFF"
 
 	switch(evt.value) {
     	case "open":
@@ -97,30 +99,38 @@ def coopDoorStateHandler(evt) {
 			break;
 		case "Blue":
 			hueColor = 70
+            hClr.hex = "#0000FF"
 			break;
 		case "Green":
 			hueColor = 39
+            hClr.hex = "#00FF00"
 			break;
 		case "Yellow":
 			hueColor = 25
+            hClr.hex = "#FFFF00"            
 			break;
 		case "Orange":
 			hueColor = 10
+            hClr.hex = "#FF6000"
 			break;
 		case "Purple":
 			hueColor = 75
+            hClr.hex = "#BF7FBF"
 			break;
 		case "Pink":
 			hueColor = 83
+            hClr.hex = "#FF5F5F"
 			break;
 		case "Red":
 			hueColor = 100
+            hClr.hex = "#FF0000"
 			break;
 	}    
     
     //bulbs*.on()
     bulbs*.setHue(hueColor)
-	bulbs*.setSaturation(saturation)     
+	bulbs*.setSaturation(saturation)   
+    bulbs*.setColor(hClr)
     
     //bulbs.each{
     	//it.on()  // Turn the bulb on when open (this method does not come directly from the colorControl capability)
