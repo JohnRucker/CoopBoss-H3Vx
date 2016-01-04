@@ -17,7 +17,7 @@ definition(
     name: "Coop Light Management",
     namespace: "JohnRucker",
     author: "John Rucker",
-    description: "Turns on coop light based on lenght of day",
+    description: "Turns on coop light based on length of day",
     category: "My Apps",
     iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
     iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",
