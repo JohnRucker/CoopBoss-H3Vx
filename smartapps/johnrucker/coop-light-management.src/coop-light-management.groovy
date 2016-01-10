@@ -29,10 +29,12 @@ preferences {
         	paragraph "Hens need 14 to 15 hours of light for optimal egg production.  This SmartApp allows you to set a target amount of light for your hens and will supplement their light in the morning. For example, lets say you want your hens to have 14 hours of light each day but there is only 10 hours of daylight during the winter.  This SmartApp will turn on the coop's light 4 hours before sunrise to supplement for the short winter days."  
         }
         section("SmartApp Settings") {
-			input(name: "coopBoss", type: "capability.doorControl", title: "Select CoopBoss to manage", required: true, multiple: false)            
-			input(name: "coopLight", type: "capability.switch", title: "Select Coop light to manage", required: true, multiple: false)
-            input(name: "targetLightHours", type: "number", title: "Enter the target daylight hours for your hens", required: true)
-            input(name: "offLightValue", type: "number", title: "Enter the CoopBoss light level that will turn off the light in the morning", required: true)            
+			input(name: "coopBoss", type: "capability.doorControl", title: "Select CoopBoss to manage.", required: true, multiple: false)            
+			input(name: "coopLight", type: "capability.switch", title: "Select Coop light(s) to manage.", required: true, multiple: true)
+            input(name: "targetLightHours", type: "decimal", title: "Enter the target daylight hours for your hens (for example to enter twelve and half hours type 12.5).", required: true)
+            input(name: "offLightValue", type: "number", title: "Enter the CoopBoss light level that will turn off the light in the morning.", defaultValue: 300, required: false)   
+            input "sendPushMessage", "enum", title: "Notify me when this app turns the light on or off (sends a SmartThings notification to your phone).", metadata: [values: ["Yes", "No"]], defaultValue: "No", required: false
+            input "skipTomorrow", "enum", title: "Sleep in tomorrow.  Select yes to disable rule for one day and let your hens sleep in tomorrow (will re-enable the next day).", metadata: [values: ["Yes", "No"]], defaultValue: "No", required: false
         }
 }
 
@@ -59,15 +61,17 @@ def checkLight(evt){
 	
     def sleepTime = 24 - targetLightHours
     
-    //log.debug "outside light level: ${outsideLightLevel}, coop light is ${lightObject.value}, sleep time: ${sleepTime} hours, timer is ${atomicState.timerState}"  
+    log.debug "outside light level: ${outsideLightLevel}, coop light is ${lightObject.value}, sleep time: ${sleepTime} hours, timer is ${atomicState.timerState}"  
      
     if (outsideLightLevel >= offLightValue && lightObject.value == "on"){
     	log.debug "Turning coop light off"
-        coopLight.off()
+        if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} coop light off.")}
+        coopLight*.off()
     }
     
     if (outsideLightLevel == 0 && atomicState.timerState == "off"){
     	def secondsToLightOn = sleepTime * 3600
+        secondsToLightOn = (int)secondsToLightOn
     	atomicState.timerState = "on"
         log.debug "Sunset detected, light will be switched on in ${secondsToLightOn} seconds."
         runIn(secondsToLightOn, "turnLightOn")	
@@ -80,8 +84,14 @@ def turnLightOn(){
     
     log.debug "Its time to wake up the hens, the outside light level is ${outsideLightLevel}"
     if (outsideLightLevel <= offLightValue){
-        log.debug "Its dark, turning on coop light"
-        coopLight.on()	
+    	if (skipTomorrow == "Yes"){
+        	log.debug "Skipping rule for one day and letting hens sleep in"
+            skipTomorrow = "No"
+        }else{
+            log.debug "Its dark, turning on coop light"
+            if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} waking up hens, coop light on.")}
+            coopLight*.on()	
+        }
     }
     atomicState.timerState = "off"
 }
