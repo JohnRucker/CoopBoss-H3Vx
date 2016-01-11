@@ -40,33 +40,35 @@ preferences {
 
 
 def installed() {
-	log.debug "Installed with settings: ${settings}"
+	log.trace "Installed with settings: ${settings}"
 	initialize()
 }
 
 def updated() {
-	log.debug "Updated with settings: ${settings}"
+	log.trace "Updated with settings: ${settings}"
 	unsubscribe()
 	initialize()
 }
 
 def initialize() {
 	atomicState.timerState = "off"
+    atomicState.clmTurnedLightOn = "no"
 	subscribe(coopBoss, "currentLightLevel", checkLight) 
 }
 
 def checkLight(evt){
     def outsideLightLevel = evt.value as int
-    def lightObject = coopLight.currentState("switch")
+    def lightObj = coopLight.currentState("switch")
 	
     def sleepTime = 24 - targetLightHours
     
-    log.debug "outside light level: ${outsideLightLevel}, coop light is ${lightObject.value}, sleep time: ${sleepTime} hours, timer is ${atomicState.timerState}"  
+    log.info "outside light level: ${outsideLightLevel}, coop light has been turned on by app: ${atomicState.clmTurnedLightOn}, sleep time: ${sleepTime} hours, timer is ${atomicState.timerState}"  
      
-    if (outsideLightLevel >= offLightValue && lightObject.value == "on"){
+    if (outsideLightLevel >= offLightValue && atomicState.clmTurnedLightOn == "yes"){
     	log.debug "Turning coop light off"
-        if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} coop light off.")}
+        if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} Coop Light Management app turned coop light off.")}
         coopLight*.off()
+        atomicState.clmTurnedLightOn = "no"
     }
     
     if (outsideLightLevel == 0 && atomicState.timerState == "off"){
@@ -89,8 +91,9 @@ def turnLightOn(){
             skipTomorrow = "No"
         }else{
             log.debug "Its dark, turning on coop light"
-            if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} waking up hens, coop light on.")}
+            if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} Coop Light Management app waking up hens, coop light on.")}
             coopLight*.on()	
+            atomicState.clmTurnedLightOn = "yes"
         }
     }
     atomicState.timerState = "off"
