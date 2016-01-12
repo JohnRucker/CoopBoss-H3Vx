@@ -58,8 +58,6 @@ def initialize() {
 
 def checkLight(evt){
     def outsideLightLevel = evt.value as int
-    def lightObj = coopLight.currentState("switch")
-	
     def sleepTime = 24 - targetLightHours
     
     log.info "outside light level: ${outsideLightLevel}, coop light has been turned on by app: ${atomicState.clmTurnedLightOn}, sleep time: ${sleepTime} hours, timer is ${atomicState.timerState}"  
@@ -81,7 +79,7 @@ def checkLight(evt){
 }
 
 def turnLightOn(){
-	def lightLevelObject = coopLight.currentState("currentLightLevel")
+	def lightLevelObject = coopBoss.currentState("currentLightLevel")
     def outsideLightLevel = lightLevelObject.value as int
     
     log.debug "Its time to wake up the hens, the outside light level is ${outsideLightLevel}"
@@ -95,6 +93,8 @@ def turnLightOn(){
             coopLight*.on()	
             atomicState.clmTurnedLightOn = "yes"
         }
+    } else {
+    	log.debug "Sun is already up no need to turn on light"
     }
     atomicState.timerState = "off"
 }
