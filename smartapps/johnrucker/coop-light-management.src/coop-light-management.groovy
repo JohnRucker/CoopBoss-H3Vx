@@ -64,7 +64,7 @@ def checkLight(evt){
      
     if (outsideLightLevel >= offLightValue && atomicState.clmTurnedLightOn == "yes"){
     	log.debug "Turning coop light off"
-        if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} Coop Light Management app turned coop light off.")}
+        if (sendPushMessage == "Yes"){sendPush("Coop Light Management app turned coop light off.")}
         coopLight*.off()
         atomicState.clmTurnedLightOn = "no"
     }
@@ -89,7 +89,7 @@ def turnLightOn(){
             skipTomorrow = "No"
         }else{
             log.debug "Its dark, turning on coop light"
-            if (sendPushMessage == "Yes"){send("${coopBoss.label ?: coopBoss.name} Coop Light Management app waking up hens, coop light on.")}
+            if (sendPushMessage == "Yes"){sendPush("Coop Light Management app waking up hens, coop light on.")}
             coopLight*.on()	
             atomicState.clmTurnedLightOn = "yes"
         }
