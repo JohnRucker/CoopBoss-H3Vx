@@ -34,7 +34,7 @@ preferences {
             input(name: "targetLightHours", type: "decimal", title: "Enter the target daylight hours for your hens (for example to enter twelve and half hours type 12.5).", required: true)
             input(name: "offLightValue", type: "number", title: "Enter the CoopBoss light level that will turn off the light in the morning.", defaultValue: 300, required: false)   
             input "sendPushMessage", "enum", title: "Notify me when this app turns the light on or off (sends a SmartThings notification to your phone).", metadata: [values: ["Yes", "No"]], defaultValue: "No", required: false
-            input "skipTomorrow", "enum", title: "Sleep in tomorrow.  Select yes to disable rule for one day and let your hens sleep in tomorrow (will re-enable the next day).", metadata: [values: ["Yes", "No"]], defaultValue: "No", required: false
+            input "skipTomorrow", "enum", title: "Let your hens sleepin.  Select yes to disable rule and let your hens sleep in tomorrow.", metadata: [values: ["Yes", "No"]], defaultValue: "No", required: false
         }
 }
 
@@ -53,7 +53,7 @@ def updated() {
 def initialize() {
 	atomicState.timerState = "off"
     atomicState.clmTurnedLightOn = "no"
-	subscribe(coopBoss, "currentLightLevel", checkLight) 
+	subscribe(coopBoss, "currentLightLevel", checkLight)     
 }
 
 def checkLight(evt){
@@ -85,8 +85,7 @@ def turnLightOn(){
     log.debug "Its time to wake up the hens, the outside light level is ${outsideLightLevel}"
     if (outsideLightLevel <= offLightValue){
     	if (skipTomorrow == "Yes"){
-        	log.debug "Skipping rule for one day and letting hens sleep in"
-            skipTomorrow = "No"
+        	log.debug "Skipping light turn on. Letting hens sleep in is set to Yes"
         }else{
             log.debug "Its dark, turning on coop light"
             if (sendPushMessage == "Yes"){sendPush("Coop Light Management app waking up hens, coop light on.")}
