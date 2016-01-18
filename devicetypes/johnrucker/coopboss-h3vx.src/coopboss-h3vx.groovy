@@ -1,7 +1,10 @@
 /**
  *  CoopBoss H3Vx
  *
- *  Copyright 2015 John Rucker
+ *	01/18/16	Masked invalid temperature reporting when TempProbe1 is below 0C
+ *				Added setBaseCurrentNE, readBaseCurrentNE, commands as well as baseCurrentNE attribute.  
+ *
+ *  Copyright 2016 John Rucker
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -44,6 +47,8 @@ metadata {
         command "setNewBaseCurrent"
         command "setNewPhotoCalibration"
         command "readNewPhotoCalibration"
+        command "readBaseCurrentNE"
+        command "setBaseCurrentNE"
 
         attribute "doorState","string"
         attribute "currentLightLevel","number"
@@ -62,6 +67,7 @@ metadata {
         attribute "coopStatus","string"
         attribute "baseDoorCurrent","number"
         attribute "photoCalibration","number"
+        attribute "baseCurrentNE","string"
         
     	fingerprint profileId: "0104", inClusters: "0000,0101,0402"
     
@@ -409,6 +415,9 @@ private Map parseReportAttributeMessage(String description) {
     } else if (descMap.cluster == "0101" && descMap.attrId == "040d") { 
         resultMap.name = "photoCalibration"
         resultMap.value = (Integer.parseInt(descMap.value, 16))           
+    } else if (descMap.cluster == "0101" && descMap.attrId == "040e") { 
+        resultMap.name = "baseCurrentNE"
+        resultMap.value = (Integer.parseInt(descMap.value, 16))           
     }    
     return resultMap
 }
@@ -420,7 +429,13 @@ private Map parseCustomMessage(String description) {
         resultMap.name = "temperature"
     	def rawT = (description - "temperature: ").trim()
         resultMap.descriptionText = "Temperature celsius value = ${rawT}"
-        if (rawT ==  -32768){											// This number is used to indicate an error in the temperature reading
+        def rawTint = Float.parseFloat(rawT)
+        if (rawTint > 65){
+        	resultMap.name = null
+            resultMap.value = null
+            resultMap.descriptionText = "Temperature celsius value = ${rawT} is invalid not updating"
+            log.warn "Invalid temperature value detected! rawT = ${rawT}, description = ${description}"
+        }else if (rawT ==  -32768){											// This number is used to indicate an error in the temperature reading
             resultMap.value = "ERR"
         }else{
             resultMap.value = celsiusToFahrenheit(rawT.toFloat()) as Float
@@ -616,6 +631,24 @@ def readNewPhotoCalibration() {
     
     def cmd = []
 	cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40D"											// Read attribute 
+    cmd    
+}
+
+def readBaseCurrentNE() {
+	log.info "Requesting base current never exceed setting "
+    
+    def cmd = []
+	cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40E"											// Read attribute 
+    cmd    
+}
+
+def setBaseCurrentNE(cValue) {
+	def cX = cValue as int
+	log.info "Setting new base Current Never Exceed to ${cX} Hex = 0x${Integer.toHexString(cX)}"
+    
+    def cmd = []
+    cmd << "st wattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40E 0x23 {${Integer.toHexString(cX)}}"		// Write attribute.  0x23 is a 32 bit unsigned integer value. 
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x40E"											// Read attribute 
     cmd    
 }
 
