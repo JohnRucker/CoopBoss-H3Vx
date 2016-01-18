@@ -1,7 +1,7 @@
 /**
  *  Coop Light Management  based on info from this URL http://scoopfromthecoop.nutrenaworld.com/winter-lighting-for-chickens/
  *
- *  Copyright 2015 John Rucker
+ *  Copyright 2016 John Rucker
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
