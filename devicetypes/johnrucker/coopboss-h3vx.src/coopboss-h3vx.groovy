@@ -1,6 +1,7 @@
 /**
  *  CoopBoss H3Vx
  *	02/29/16	Fixed app crash with Android by changing the syntax of default state in tile definition. 
+ *				Fixed null value errors during join process.  Added 3 new commands to refresh data.
  *
  *	01/18/16	Masked invalid temperature reporting when TempProbe1 is below 0C
  *				Added setBaseCurrentNE, readBaseCurrentNE, commands as well as baseCurrentNE attribute.  
@@ -50,6 +51,9 @@ metadata {
         command "readNewPhotoCalibration"
         command "readBaseCurrentNE"
         command "setBaseCurrentNE"
+        command "updateSensitivity"
+        command "updateCloseLightLevel"
+        command "updateOpenLightLevel"
 
         attribute "doorState","string"
         attribute "currentLightLevel","number"
@@ -160,7 +164,7 @@ metadata {
         }
         
         valueTile("SetClValue", "device.closeLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state "default", label:'Close\nSunlight\n${currentValue}'
+        state "default", label:'Close\nSunlight\n${currentValue}', action:'updateCloseLightLevel'
         }        
         
         controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
@@ -168,7 +172,7 @@ metadata {
         }
         
         valueTile("SetOpValue", "device.openLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state "default", label:'Open\nSunlight\n${currentValue}'
+        state "default", label:'Open\nSunlight\n${currentValue}', action:'updateOpenLightLevel'
         } 
         
         controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
@@ -176,7 +180,7 @@ metadata {
         }        
         
         valueTile("SetSensitivityValue", "device.doorSensitivity", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state "default", label:'Door\nSensitivity\n${currentValue}'
+        state "default", label:'Door\nSensitivity\n${currentValue}', action:'updateSensitivity'
         }          
         
         standardTile("refresh", "device.refresh", width: 2, height: 2, decoration: "flat", inactiveLabel: false) {
@@ -464,34 +468,29 @@ def getFahrenheit(value) {
 // Private methods
 def callUpdateStatusTxt(){	
 	def cTemp = device.currentState("TempProb1")?.value
-    
+    def cLight = 0
     def testNull = device.currentState("currentLightLevel")?.value
     if (testNull != null){
-    def cLight = device.currentState("currentLightLevel")?.value as int
-    } else {
-    def cLight = 0
-    }
-    
+    cLight = device.currentState("currentLightLevel")?.value as int
+    }   
 	updateStatusTxt(cTemp, cLight)
 }
 
 def updateStatusTxt(currentTemp, currentLight){
 	//log.info "called updateStatusTxt with ${currentTemp}, ${currentLight}"
     def cTmp = currentTemp
+    def cLL = 10
+    def oLL = 10
     
     def testNull = device.currentState("closeLightLevel")?.value
     if (testNull != null){
-    	def cLL = device.currentState("closeLightLevel")?.value as int
-    } else {
-    	def cLL = 10;
-    }
+    	cLL = device.currentState("closeLightLevel")?.value as int
+	}
 
     testNull = device.currentState("openLightLevel")?.value
     if (testNull != null){
-    	def oLL = device.currentState("openLightLevel")?.value as int
-    } else {
-    	def oLL = 10;
-    }    
+    	oLL = device.currentState("openLightLevel")?.value as int
+    }   
     
     def aOpnEn = device.currentState("autoOpenEnable")?.value
     def aClsEn = device.currentState("autoCloseEnable")?.value
@@ -711,6 +710,26 @@ def updateSun() {
     cmd
 }
 
+def updateSensitivity() {
+	log.debug "Sending attribute read request for door sensitivity"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0408"	// Read Door sensitivity
+    cmd
+}
+
+def updateCloseLightLevel() {
+	log.debug "Sending attribute read close light level"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0401"	
+    cmd
+}
+
+def updateOpenLightLevel() {
+	log.debug "Sending attribute read open light level"   
+    def cmd = []    
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0402"	
+    cmd
+}
 
 def refresh() {
 	log.debug "sending refresh command"   
@@ -736,6 +755,9 @@ def refresh() {
     cmd << "st rattr 0x${device.deviceNetworkId} 0x39 0x0402 0x0000"    // Read Current Temperature from Coop Probe 1
     cmd << "delay 150" 
     
+    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0408"    // Object detection sensitivity 
+    cmd << "delay 150"  
+    
     cmd << "st rattr 0x${device.deviceNetworkId} 0x40 0x0402 0x0000"    // Read Current Temperature from Coop Probe 2    
     cmd << "delay 150"   
     
@@ -749,9 +771,7 @@ def refresh() {
     cmd << "delay 150"     
     
     cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x409"		// Read Base current
-    cmd << "delay 150"     
-    
-    cmd << "st rattr 0x${device.deviceNetworkId} 0x38 0x0101 0x0408"    // Object detection sensitivity      
+
     cmd
 }
 
