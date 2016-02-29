@@ -142,16 +142,16 @@ metadata {
 		}            
         
 		valueTile("TempProb1", "device.TempProb1", width: 2, height: 2, decoration: "flat"){
-        state defaultState: true, label:'Coop\r${currentValue}°', unit:"F", action:"updateTemp1"}         
+        state "default", label:'Coop\r${currentValue}°', unit:"F", action:"updateTemp1"}         
         
 		valueTile("TempProb2", "device.TempProb2", width: 2, height: 2, decoration: "flat"){
-        state defaultState: true, label:'Outside\r${currentValue}°', unit:"F", action:"updateTemp2"}        
+        state "default", label:'Outside\r${currentValue}°', unit:"F", action:"updateTemp2"}        
 
 		valueTile("currentLevel", "device.currentLightLevel", width: 2, height: 2, decoration: "flat") {
-        state defaultState: true, label:'Sun\r${currentValue}', action:"updateSun"}    
+        state "default", label:'Sun\r${currentValue}', action:"updateSun"}    
                 
         valueTile("dayOrNight", "device.dayOrNight", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state defaultState: true, label:'${currentValue}.'
+        state "default", label:'${currentValue}.'
         }             
                 
         controlTile("SetClSlider", "device.closeLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
@@ -159,7 +159,7 @@ metadata {
         }
         
         valueTile("SetClValue", "device.closeLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state defaultState: true, label:'Close\nSunlight\n${currentValue}'
+        state "default", label:'Close\nSunlight\n${currentValue}'
         }        
         
         controlTile("SetOpSlider", "device.openLightLevel", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
@@ -167,7 +167,7 @@ metadata {
         }
         
         valueTile("SetOpValue", "device.openLightLevel", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state defaultState: true, label:'Open\nSunlight\n${currentValue}'
+        state "default", label:'Open\nSunlight\n${currentValue}'
         } 
         
         controlTile("SetSensitivitySlider", "device.doorSensitivity", "slider", height: 2, width: 4, inactiveLabel: false, range:"(1..100)") {
@@ -175,11 +175,11 @@ metadata {
         }        
         
         valueTile("SetSensitivityValue", "device.doorSensitivity", decoration: "flat",  inactiveLabel: false, width: 2, height: 2) {
-        state defaultState: true, label:'Door\nSensitivity\n${currentValue}'
+        state "default", label:'Door\nSensitivity\n${currentValue}'
         }          
         
         standardTile("refresh", "device.refresh", width: 2, height: 2, decoration: "flat", inactiveLabel: false) {
-		state defaultState: true, label:'All', action:"refresh.refresh", icon:"st.secondary.refresh-icon"
+		state "default", label:'All', action:"refresh.refresh", icon:"st.secondary.refresh-icon"
 		}   
         
 		standardTile("aux1", "device.Aux1", width: 2, height: 2, canChangeIcon: true) {
