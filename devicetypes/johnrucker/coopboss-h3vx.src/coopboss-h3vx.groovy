@@ -1,5 +1,6 @@
 /**
  *  CoopBoss H3Vx
+ *	02/29/16	Fixed app crash with Android by changing the syntax of default state in tile definition. 
  *
  *	01/18/16	Masked invalid temperature reporting when TempProbe1 is below 0C
  *				Added setBaseCurrentNE, readBaseCurrentNE, commands as well as baseCurrentNE attribute.  
