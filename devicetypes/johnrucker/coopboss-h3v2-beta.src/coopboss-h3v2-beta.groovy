@@ -243,9 +243,10 @@ private Map parseCatchAllMessage(String description) {
                 if (tempOffsetOutside) {
                     def offset = tempOffsetOutside as int
 					resultMap.value = resultMap.value + offset
+                    resultMap.isStateChange = true						// Force events to fire in SmartApps even if value didn't change
                 }                      
             }
-            sendEvent(name: "temperature", value: resultMap.value, displayed: false)		// set the temperatureMeasurment capability to temperature
+            sendEvent(name: "temperature", value: resultMap.value, displayed: false, isStateChange: true)		// set the temperatureMeasurment capability to temperature
             break
 
             case 0x40:													// Endpoint 0x40 is the temperature of probe 2
@@ -261,6 +262,7 @@ private Map parseCatchAllMessage(String description) {
                 if (tempOffsetCoop) {
                     def offset = tempOffsetCoop as int
 					resultMap.value = resultMap.value + offset
+                    resultMap.isStateChange = true						// Force events to fire in SmartApps even if value didn't change
                 }                                                
             }                           
             break
