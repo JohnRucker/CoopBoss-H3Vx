@@ -462,9 +462,15 @@ def getFahrenheit(value) {
 }
 
 // Private methods
-def callUpdateStatusTxt(){
+def callUpdateStatusTxt(){	
 	def cTemp = device.currentState("TempProb1")?.value
-	def cLight = device.currentState("currentLightLevel")?.value as int
+    
+    def testNull = device.currentState("currentLightLevel")?.value
+    if (testNull != null){
+    def cLight = device.currentState("currentLightLevel")?.value as int
+    } else {
+    def cLight = 0
+    }
     
 	updateStatusTxt(cTemp, cLight)
 }
@@ -472,8 +478,21 @@ def callUpdateStatusTxt(){
 def updateStatusTxt(currentTemp, currentLight){
 	//log.info "called updateStatusTxt with ${currentTemp}, ${currentLight}"
     def cTmp = currentTemp
-    def cLL = device.currentState("closeLightLevel")?.value as int
-    def oLL = device.currentState("openLightLevel")?.value as int 
+    
+    def testNull = device.currentState("closeLightLevel")?.value
+    if (testNull != null){
+    	def cLL = device.currentState("closeLightLevel")?.value as int
+    } else {
+    	def cLL = 10;
+    }
+
+    testNull = device.currentState("openLightLevel")?.value
+    if (testNull != null){
+    	def oLL = device.currentState("openLightLevel")?.value as int
+    } else {
+    	def oLL = 10;
+    }    
+    
     def aOpnEn = device.currentState("autoOpenEnable")?.value
     def aClsEn = device.currentState("autoCloseEnable")?.value
     
