@@ -1,0 +1,8 @@
+title: CoopBoss-H3Vx
+description: SmartThings custom device types and SmartApps for the CoopBoss Hardware Version 3
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
