@@ -1,5 +1,5 @@
 ### Welcome to the CoopBoss SmartThings download.
-If you own a CoopBoss.com controller you are in the right place to get the latest SmartThings software for it.  To install the programs you will need to [log into your SmartThings IDE](https://graph.api.smartthings.com/) and follow these step by step instructions see our [Custom Device type install guide](http://coopboss.com/CoopBoss%20SmartThings%20Driver%20Install.pdf). 
+If you own a CoopBoss.com controller you are in the right place to get the latest SmartThings software for it.  To install the programs you will need to [log into your SmartThings IDE](https://graph.api.smartthings.com/) and follow these step by step instructions see our [Door Jammed SmartApp install guide](http://coopboss.com/CoopBoss%20SmartThings%20Driver%20Install.pdf). 
 
 ### Additional CoopBoss SmartApps:
 [door jammed notification SmartApp:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/door-jammed-notification.src/door-jammed-notification.groovy) Sends a notification to your smartphone when your coop door jams.
