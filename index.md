@@ -8,7 +8,7 @@ If you own a CoopBoss.com controller you are in the right place to get the lates
 
 [Admin Set Door Current:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/admin-set-base-current.src/admin-set-base-current.groovy) Allows you to set your door's normal close currently to a known value.  Please contact CoopBoss support before using this SmartApp.
 
-[Admin Set Max Current Never Exceed:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/admin-set-max-current-never-exceed.src/admin-set-max-current-never-exceed.groovy) This SmartApp allows you to set a new Max Current Never Exceed (MCNE) for your CoopBoss. The MCNE is used as a safety setting during a high current close (forced close) or an open.  This setting should be set to match the max current of the 12v power supply connected to your CoopBoss.  Typical settings are 3000mA or 4000mA.  This SmartApp requires the latest [CoopBoss custom device type](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/devicetypes/johnrucker/coopboss-h3vx.src/coopboss-h3vx.groovy) to be installed to run correctly. 
+[Admin Set Max Current Never Exceed:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/admin-set-max-current-never-exceed.src/admin-set-max-current-never-exceed.groovy) This SmartApp allows you to set a new Max Current Never Exceed (MCNE) for your CoopBoss. The MCNE is used as a safety setting during a high current close (forced close) or an open.  This setting should be set to match the max current of the 12v power supply connected to your CoopBoss.  Typical settings are 3000mA or 4000mA.   
 
 ### What is the CoopBoss?
 The CoopBoss is a management system for your backyard chicken coop.  Its primary function is to safely and reliable manage your coop's door.  The CoopBoss monitors the sun and will safely  close your coop door at sunset and open it again at sunrise plus a lot more.
@@ -16,6 +16,6 @@ The CoopBoss is a management system for your backyard chicken coop.  Its primary
 #### Parallax features the technology used by the CoopBoss on their [learn web site](http://learn.parallax.com/inspiration/coop-boss)  
 
 ### How can I buy the hardware?
-You can purchase the hardware at [DoodleDooCoops](http://DoodleDooCoops.com)
+You can purchase the hardware at [etsy CoopBoss store](https://www.etsy.com/listing/485524304/protect-your-backyard-chickens-with-the?ref=shop_home_active_1)
 
 For more information see [CoopBoss.com](http://CoopBoss.com)
