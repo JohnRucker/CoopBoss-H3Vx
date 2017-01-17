@@ -18,6 +18,6 @@ The CoopBoss is a management system for your backyard chicken coop.  Its primary
 #### Parallax features the technology used by the CoopBoss on their [learn web site.](http://learn.parallax.com/inspiration/coop-boss)  
 
 ### How can I buy the hardware?
-You can purchase the hardware from our [etsy CoopBoss store.](https://www.etsy.com/listing/485524304/protect-your-backyard-chickens-with-the?ref=shop_home_active_1)
+You can purchase the hardware from our [Etsy CoopBoss store.](https://www.etsy.com/listing/485524304/protect-your-backyard-chickens-with-the?ref=shop_home_active_1)
 
 For more information see [CoopBoss.com.](http://CoopBoss.com)
