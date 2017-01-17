@@ -13,9 +13,9 @@ If you own a CoopBoss.com controller you are in the right place to get the lates
 ### What is the CoopBoss?
 The CoopBoss is a management system for your backyard chicken coop.  Its primary function is to safely and reliable manage your coop's door.  The CoopBoss monitors the sun and will safely  close your coop door at sunset and open it again at sunrise plus a lot more.
 #### SmartThings awards the CoopBoss best in show for their [Show Us Your SmartThings](http://blog.smartthings.com/stories/a-smart-chicken-coop/)
-#### Parallax features the technology used by the CoopBoss on their [learn web site](http://learn.parallax.com/inspiration/coop-boss)  
+#### Parallax features the technology used by the CoopBoss on their [learn web site.](http://learn.parallax.com/inspiration/coop-boss)  
 
 ### How can I buy the hardware?
-You can purchase the hardware at [etsy CoopBoss store](https://www.etsy.com/listing/485524304/protect-your-backyard-chickens-with-the?ref=shop_home_active_1)
+You can purchase the hardware from our [etsy CoopBoss store.](https://www.etsy.com/listing/485524304/protect-your-backyard-chickens-with-the?ref=shop_home_active_1)
 
-For more information see [CoopBoss.com](http://CoopBoss.com)
+For more information see [CoopBoss.com.](http://CoopBoss.com)
