@@ -1,5 +1,4 @@
 /**
- * Virtual Garage Door Opener
  *
  *  Copyright 2014 SmartThings
  *
