@@ -1,5 +1,4 @@
 /**
- *  Door Jammed Notification
  *
  *  Copyright 2015 John Rucker
  *
