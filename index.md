@@ -12,6 +12,13 @@ If you own a CoopBoss.com controller you are in the right place to get the lates
 
 [Admin Set Max Current Never Exceed:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/admin-set-max-current-never-exceed.src/admin-set-max-current-never-exceed.groovy) This SmartApp allows you to set a new Max Current Never Exceed (MCNE) for your CoopBoss. The MCNE is used as a safety setting during a high current close (forced close) or an open.  This setting should be set to match the max current of the 12v power supply connected to your CoopBoss.  Typical settings are 3000mA or 4000mA.   
 
+### Advanced Features:
+### Virtual CoopBoss custom device handler and SmartApp:
+[Overview and installation Video](https://youtu.be/JmPE0K3Vc20)
+[Virtual CoopBoss custom device handler:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/devicetypes/johnrucker/virtual-coopboss.src/virtual-coopboss.groovy) This virtual CoopBoss device handler will mask your CoopBoss as a Garage door, Door Lock, or a on / off switch.  This device handler along with the below Virtual CoopBoss Manger SmartApp will allow you to include your CoopBoss into your SmartThings home automations and the Smart Home Monitor.
+
+[Virtual CoopBoss Manager SmartApp:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/virtual-coopboss-manager.src/virtual-coopboss-manager.groovy) This SmartApp acts as an agent / broker for the above virtual CoopBoss device handler and your physical CoopBoss.
+
 ### What is the CoopBoss?
 The CoopBoss is a management system for your backyard chicken coop.  Its primary function is to safely and reliable manage your coop's door.  The CoopBoss monitors the sun and will safely  close your coop door at sunset and open it again at sunrise plus a lot more.
 #### SmartThings awards the CoopBoss best in show for their [Show Us Your SmartThings](http://blog.smartthings.com/stories/a-smart-chicken-coop/)
