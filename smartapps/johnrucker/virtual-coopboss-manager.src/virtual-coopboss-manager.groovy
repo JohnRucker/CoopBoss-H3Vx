@@ -17,14 +17,14 @@ definition(
     name: "Virtual CoopBoss Manager",
     namespace: "JohnRucker",
     author: "John.Rucker@Solar-current.com",
-    description: "Used with CoopBoss Virtual Door Device Handlers to simulate a garage door",
+    description: "Connects virtual CoopBoss device handler to physical CoopBoss.",
     category: "My Apps",
     iconUrl: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo.png",
     iconX2Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo2x.png",
     iconX3Url: "http://coopboss.com/images/SmartThingsIcons/coopbossLogo3x.png")
 
 preferences {
-    section("When the Virtual Garage door state changes") {
+    section("When the Virtual CoopBoss state changes") {
         paragraph "Pick virtual CoopBoss Door."
 		input "virtualCoopBoss", "capability.garageDoorControl", title: "Select virtual CoopBoss", required: true, multiple: false      
     
