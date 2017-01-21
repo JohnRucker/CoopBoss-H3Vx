@@ -13,7 +13,7 @@ If you own a CoopBoss.com controller you are in the right place to get the lates
 [Admin Set Max Current Never Exceed:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/smartapps/johnrucker/admin-set-max-current-never-exceed.src/admin-set-max-current-never-exceed.groovy) This SmartApp allows you to set a new Max Current Never Exceed (MCNE) for your CoopBoss. The MCNE is used as a safety setting during a high current close (forced close) or an open.  This setting should be set to match the max current of the 12v power supply connected to your CoopBoss.  Typical settings are 3000mA or 4000mA.   
 
 ### Advanced Features:
-[Advanced features overview and installation Video](https://youtu.be/JmPE0K3Vc20)
+Advanced features overview and installation Video comming soon
 
 ### Virtual CoopBoss custom device handler and SmartApp:
 [Virtual CoopBoss custom device handler:](https://raw.githubusercontent.com/JohnRucker/CoopBoss-H3Vx/master/devicetypes/johnrucker/virtual-coopboss.src/virtual-coopboss.groovy) This virtual CoopBoss device handler will mask your CoopBoss as a Garage door, Door Lock, or a on / off switch.  This device handler along with the below Virtual CoopBoss Manger SmartApp will allow you to include your CoopBoss into your SmartThings home automations and the Smart Home Monitor.
