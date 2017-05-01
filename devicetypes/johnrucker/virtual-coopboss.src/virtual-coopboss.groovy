@@ -22,9 +22,15 @@ metadata {
         capability "Lock"
 		capability "Refresh"
 		capability "Sensor"
+        capability "Illuminance Measurement"
+        capability "Temperature Measurement"
+        capability "Light"
         
         command "finishOpening"
         command "finishClosing"
+        command "setLux"
+        command "setTemperature"
+        command "setLight"
 	}
 
 	simulator {
@@ -68,13 +74,13 @@ def close() {
 }
 
 def on(){
-	log.info("On calling close")
-	close()
+	log.info("turning switch on")
+    sendEvent(name: "switch", value: "on")
 }
 
 def off(){
-	log.info("Off calling open")
-	open()
+	log.info("turning switch off")
+    sendEvent(name: "switch", value: "off")
 }
 
 def unlock(){
@@ -87,19 +93,31 @@ def lock(){
 	close()
 }
 
+def setLux(luxValue){
+	log.info("Setting lux value to ${luxValue} ")
+	sendEvent(name: "illuminance", value: luxValue)
+}
+
+def setTemperature(temperatureValue){
+	log.info("Setting temperature value to ${temperatureValue}")
+	sendEvent(name: "temperature", value: temperatureValue)
+}
+
+def setLight(lightValue){
+	log.info("Setting light value to ${lightValue} ")
+	sendEvent(name: "switch", value: lightValue)
+}
 
 def finishOpening() {
 	log.info("Door finished opening")
     sendEvent(name: "door", value: "open")
-    sendEvent(name: "contact", value: "open")
-    sendEvent(name: "switch", value: "off")   
+    sendEvent(name: "contact", value: "open")  
     sendEvent(name: "lock", value: "unlocked")    
 }
 
 def finishClosing() {
 	log.info("Door finished closing")
     sendEvent(name: "door", value: "closed")
-    sendEvent(name: "contact", value: "closed")
-    sendEvent(name: "switch", value: "on")    
+    sendEvent(name: "contact", value: "closed")  
     sendEvent(name: "lock", value: "locked")       
 }
