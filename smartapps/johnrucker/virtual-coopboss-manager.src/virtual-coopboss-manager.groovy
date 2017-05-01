@@ -46,7 +46,11 @@ def updated() {
 
 def initialize() {
 	subscribe(physicalCoopBoss, "doorState", coopDoorStateHandler)
+	subscribe(physicalCoopBoss, "currentLightLevel", coopLuxHandler) 
+	subscribe(physicalCoopBoss, "TempProb1", coopTemperatureHandler)  
+	subscribe(physicalCoopBoss, "Aux1", coopLightHandler)    
     subscribe(virtualCoopBoss, "door", virtualCoopDoorStateHandler)
+    subscribe(virtualCoopBoss, "switch", virtualCoopSwitchHandler)    
     syncVirtualToPhysical()
 }
 
@@ -62,6 +66,21 @@ def coopDoorStateHandler(evt) {
     }    
 }
 
+def coopLuxHandler(evt) {
+	log.info "coopLuxHandler(evt) called evt.name = ${evt.name} evt.value = ${evt.value}"  
+    virtualCoopBoss.setLux(evt.value)   
+}
+
+def coopTemperatureHandler(evt) {
+	log.info "coopTemperatureHandler(evt) called evt.name = ${evt.name} evt.value = ${evt.value}"  
+    virtualCoopBoss.setTemperature(evt.value)   
+}
+
+def coopLightHandler(evt) {
+	log.info "coopLightHandler(evt) called evt.name = ${evt.name} evt.value = ${evt.value}"  
+    virtualCoopBoss.setLight(evt.value)   
+}
+
 def virtualCoopDoorStateHandler(evt) {
 	log.info "virtualCoopDoorStateHandler(evt) called evt.name = ${evt.name} evt.value = ${evt.value}"  
     if(evt.name == "door" && evt.value == "opening"){
@@ -70,6 +89,17 @@ def virtualCoopDoorStateHandler(evt) {
     } else if(evt.name == "door" && evt.value == "closing"){
         log.debug "virtual coopboss sending CLOSE command to physical coopboss"
         physicalCoopBoss.closeDoor()        
+    }
+}
+
+def virtualCoopSwitchHandler(evt) {
+	log.info "virtualCoopSwitchHandler(evt) called evt.name = ${evt.name} evt.value = ${evt.value}"  
+    if(evt.value == "on"){
+        log.debug "virtual coopboss sending on command to Aux 1 on physical coopboss"
+        physicalCoopBoss.Aux1On()
+    } else {
+        log.debug "virtual coopboss sending off command to Aux 1 on physical coopboss"
+        physicalCoopBoss.Aux1Off()      
     }
 }
 
